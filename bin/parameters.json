@@ -1,0 +1,81 @@
+{
+  "aws_config": {
+    "region": "us-east-1",
+    "profile": "mforbush"
+  },
+  "iam_role": {
+    "role_name": "GlueServiceRole",
+    "create_custom_policy": true
+  },
+  "aurora": {
+    "db_cluster_identifier": "aurora-mysql-cluster",
+    "engine": "aurora-mysql",
+    "engine_version": "5.7.mysql_aurora.2.11.1",
+    "master_username": "admin",
+    "db_instance_class": "db.t3.medium",
+    "vpc_security_group_ids": ["sg-037b5747a16125191"],
+    "db_subnet_group_name": "aurora-subnet-group",
+    "db_name": "sampledb",
+    "port": 3306,
+    "backup_retention_period": 7,
+    "preferred_backup_window": "07:00-09:00",
+    "preferred_maintenance_window": "sun:04:00-sun:06:00",
+    "storage_encrypted": true,
+    "deletion_protection": false
+  },
+  "glue_connection": {
+    "connection_name": "aurora-mysql-connection",
+    "connection_type": "JDBC",
+    "connection_properties": {
+      "JDBC_CONNECTION_URL": "jdbc:mysql://{ENDPOINT}:3306/sampledb",
+      "USERNAME": "admin",
+      "PASSWORD": "${AURORA_DB_PASSWORD}"
+    },
+    "physical_connection_requirements": {
+      "availability_zone": "us-east-1a",
+      "security_group_id_list": ["sg-037b5747a16125191"],
+      "subnet_id": "subnet-0553f25524068da63"
+    }
+  },
+  "glue_crawler": {
+    "crawler_name": "aurora-mysql-crawler",
+    "database_name": "aurora_catalog",
+    "targets": {
+      "jdbc_targets": [
+        {
+          "connection_name": "aurora-mysql-connection",
+          "path": "sampledb/%",
+          "exclusions": []
+        }
+      ]
+    },
+    "schedule": "cron(0 0 * * ? *)",
+    "table_prefix": "aurora_"
+  },
+  "glue_etl_job": {
+    "job_name": "aurora-to-s3-etl",
+    "description": "ETL job to extract data from Aurora MySQL and store in S3",
+    "role": "GlueServiceRole",
+    "glue_version": "3.0",
+    "worker_type": "G.1X",
+    "number_of_workers": 2,
+    "max_concurrent_runs": 1,
+    "max_retries": 0,
+    "timeout": 2880,
+    "script_location": "s3://aws-glue-scripts-758045074543-us-east-1/admin/aurora-to-s3-etl.py",
+    "default_arguments": {
+      "--TempDir": "s3://aws-glue-temporary-758045074543-us-east-1/admin",
+      "--job-bookmark-option": "job-bookmark-enable",
+      "--enable-metrics": "true",
+      "--enable-continuous-cloudwatch-log": "true",
+      "--SOURCE_DATABASE": "aurora_catalog",
+      "--SOURCE_TABLE": "aurora_customers",
+      "--TARGET_S3_LOCATION": "s3://glue-target-bucket-758045074543/data/customers/"
+    }
+  },
+  "athena": {
+    "database_name": "aurora_analytics",
+    "workgroup": "primary",
+    "output_location": "s3://aws-athena-query-results-758045074543-us-east-1/"
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "aws_config": {
+    "region": "us-east-1",
+    "profile": "your-aws-profile"
+  },
+  "iam_role": {
+    "role_name": "GlueServiceRole",
+    "create_custom_policy": true
+  },
+  "aurora": {
+    "db_cluster_identifier": "aurora-mysql-cluster",
+    "engine": "aurora-mysql",
+    "engine_version": "5.7.mysql_aurora.2.11.1",
+    "master_username": "admin",
+    "db_instance_class": "db.t3.medium",
+    "vpc_security_group_ids": ["sg-xxxxxxxxxxxxxxxxx"],
+    "db_subnet_group_name": "aurora-subnet-group",
+    "db_name": "sampledb",
+    "port": 3306,
+    "backup_retention_period": 7,
+    "preferred_backup_window": "07:00-09:00",
+    "preferred_maintenance_window": "sun:04:00-sun:06:00",
+    "storage_encrypted": true,
+    "deletion_protection": false
+  },
+  "glue_connection": {
+    "connection_name": "aurora-mysql-connection",
+    "connection_type": "JDBC",
+    "connection_properties": {
+      "JDBC_CONNECTION_URL": "jdbc:mysql://{ENDPOINT}:3306/sampledb",
+      "USERNAME": "admin",
+      "PASSWORD": "${AURORA_DB_PASSWORD}"
+    },
+    "physical_connection_requirements": {
+      "availability_zone": "us-east-1a",
+      "security_group_id_list": ["sg-xxxxxxxxxxxxxxxxx"],
+      "subnet_id": "subnet-xxxxxxxxxxxxxxxxx"
+    }
+  },
+  "glue_crawler": {
+    "crawler_name": "aurora-mysql-crawler",
+    "database_name": "aurora_catalog",
+    "targets": {
+      "jdbc_targets": [
+        {
+          "connection_name": "aurora-mysql-connection",
+          "path": "sampledb/%",
+          "exclusions": []
+        }
+      ]
+    },
+    "role": "GlueServiceRole",
+    "database_name": "aurora_catalog",
+    "schedule": "cron(0 12 * * ? *)",
+    "schema_change_policy": {
+      "update_behavior": "UPDATE_IN_DATABASE",
+      "delete_behavior": "DEPRECATE_IN_DATABASE"
+    }
+  },
+  "glue_job": {
+    "job_name": "aurora-to-s3-etl",
+    "role": "GlueServiceRole",
+    "script_location": "s3://your-glue-scripts-bucket/aurora-to-s3-etl.py",
+    "temp_dir": "s3://your-glue-temp-bucket/temp/",
+    "job_bookmark": "job-bookmark-enable",
+    "max_retries": 1,
+    "timeout": 2880,
+    "max_capacity": 2.0,
+    "worker_type": "G.1X",
+    "number_of_workers": 2
+  }
+}

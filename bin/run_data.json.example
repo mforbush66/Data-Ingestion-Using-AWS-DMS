@@ -1,0 +1,27 @@
+{
+  "last_run": "2025-01-01T00:00:00.000000",
+  "resources": {
+    "rds": {
+      "instance_id": "your-mssql-source-instance",
+      "endpoint": "your-instance.region.rds.amazonaws.com:1433"
+    },
+    "s3": {
+      "bucket_name": "dms-target-{account-id}-{region}",
+      "folder": "dms-data"
+    },
+    "iam": {
+      "s3_role_arn": "arn:aws:iam::{account-id}:role/dms-s3-access-role",
+      "vpc_role_arn": "arn:aws:iam::{account-id}:role/dms-vpc-role"
+    },
+    "dms": {
+      "replication_instance_id": "your-dms-instance",
+      "source_endpoint_id": "your-sqlserver-source",
+      "target_endpoint_id": "your-s3-target",
+      "replication_task_id": "your-sqlserver-to-s3-task",
+      "replication_instance_arn": "arn:aws:dms:{region}:{account-id}:rep:XXXXXXXXXXXXXXXXXXXXXXXXXX",
+      "source_endpoint_arn": "arn:aws:dms:{region}:{account-id}:endpoint:XXXXXXXXXXXXXXXXXXXXXXXXXX",
+      "target_endpoint_arn": "arn:aws:dms:{region}:{account-id}:endpoint:XXXXXXXXXXXXXXXXXXXXXXXXXX",
+      "replication_task_arn": "arn:aws:dms:{region}:{account-id}:task:XXXXXXXXXXXXXXXXXXXXXXXXXX"
+    }
+  }
+}

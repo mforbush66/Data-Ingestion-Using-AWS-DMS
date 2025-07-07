@@ -1,0 +1,93 @@
+Project Rules: Next.js + TypeScript
+Primary Goals
+Get the website functional again.
+Eliminate all TypeScript errors to prepare for a clean build.
+Rule: The AI or developer must strictly follow these rules without introducing enhancements, optimizations, or subjective deviations.
+Rule: If uncertain, ASK for clarification before proceeding.
+00. Keep It Simple Keep It Simple Keep It Simple Keep It Simple Keep It Simple Keep It Simple Keep It Simple Keep It Simple Keep It Simple. Employ the most basic straightforward and simple solution first, if it requires something more complex than we will take that as it comes!!!!!
+
+
+1. Data Management
+DO NOT hardcode product or category data.
+DO NOT hardcode category structures.
+DO NOT create static product lists.
+DO NOT maintain local category hierarchies.
+All data must come from the WooCommerce backend API via centralized methods in src/lib/woocommerce.ts.
+2. API Integration
+NEVER make direct API calls from components or pages. Use centralized methods in src/lib/woocommerce.ts.
+Ensure strict typing for all API responses.
+Example:
+ts
+Copy code
+export interface Product {
+  id: number;
+  name: string;
+  price: string;
+  stock_status: "instock" | "outofstock";
+  categories: Category[];
+}
+DO NOT introduce error-handling logic beyond what is necessary to fix runtime issues.
+3. Environment Variables
+DO NOT commit .env.local to version control.
+Ensure .env.local is included in .gitignore.
+4. TypeScript Fixes
+Address all existing TypeScript errors.
+DO NOT rewrite code unless required to resolve errors.
+Use @ts-expect-error with a TODO comment for temporary fixes where necessary. Example:
+ts
+Copy code
+// @ts-expect-error TODO: Fix API response type
+const data = await fetchProducts();
+Enable strict mode in tsconfig.json ("strict": true) and resolve resulting errors incrementally.
+Use utility types (Partial<T>, Pick<T, K>, Omit<T, K>) to address type issues efficiently.
+DO NOT add or remove TypeScript features unless explicitly requested.
+5. Code Structure
+Follow this file structure:
+graphql
+Copy code
+src/
+├── components/     # Shared React components
+├── hooks/          # Custom React hooks
+├── utils/          # Helper functions
+├── lib/            # API and shared libraries
+├── types/          # TypeScript types
+DO NOT restructure or refactor unless required to fix errors.
+6. Error Handling
+Add minimal error handling only where necessary to prevent crashes.
+Use simple fallback states for failing components:
+tsx
+Copy code
+if (!data) return <div>Error loading products.</div>;
+Log errors only when required for debugging.
+7. Testing
+Run existing tests to confirm that fixes do not break functionality.
+Write minimal tests only for newly fixed errors.
+8. Git Usage
+Use the following commit prefixes for clarity:
+fix: for bug fixes.
+ts-fix: for resolving TypeScript errors.
+Example commit messages:
+makefile
+Copy code
+fix: resolve missing API call in ProductList component
+ts-fix: add type for WooCommerce API response
+DO NOT include unnecessary files or changes in commits.
+9. Development Workflow
+Fix Runtime Errors: Start by addressing errors that prevent the website from running.
+Fix TypeScript Errors: Eliminate TypeScript errors to ensure a clean build.
+Verify Type Safety: Run tsc --noEmit to confirm all errors are resolved:
+bash
+Copy code
+tsc --noEmit
+Test Functionality: Ensure the website runs without crashing and meets the defined goals.
+10. Scope Limitations
+DO NOT introduce feature changes, enhancements, or optimizations.
+DO NOT restructure or rewrite components unless necessary to fix an issue.
+DO NOT make assumptions about user intentions—ask if unclear.
+11. Communication
+Rule: If the AI or developer is uncertain about the task, they must ask for clarification before proceeding.
+Rule: The AI must explicitly state the rules it is following when applying changes.
+12. Keep It Simple
+Focus only on fixing errors and preparing the project for a clean build.
+DO NOT propose or implement improvements unless explicitly requested.
+ DO NOT MAKE ASSUMPTIONS On such things as weather software is installed or not. You are coming to the TABLE BLIND, AND DO NOT KNOW WHAT IS HERE, BUT THERE'S A SIMPLE WAY TO FIND OUT; ASK ME!!!!!!
