@@ -7,6 +7,10 @@ bin/.env
 run_data.json
 bin/run_data.json
 
+# Configuration files with sensitive AWS details
+parameters.json
+bin/parameters.json
+
 # AWS credentials and configuration
 .aws/
 credentials
